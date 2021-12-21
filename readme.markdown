@@ -21,9 +21,12 @@ The module fulfills two purposes:
 The module's purpose is *not* to create an agr file from scratch. For this,
 use the [pygrace][3] module.
 
+Full documentation on functions detailed [here][4].
+
 [1]: http://plasma-gate.weizmann.ac.il/Grace/
 [2]: http://ipython.org
 [3]: http://pygrace.github.io
+[4]: https://docs.google.com/spreadsheets/d/1clXLlwlHTz83RTMK7VZgq9BEgVZUGXmne_9X8XcWDMI/edit?usp=sharing
 
 ## Installation ##
 
