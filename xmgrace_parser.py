@@ -118,14 +118,14 @@
     completion!)
 """
 
-__version__ = '1.0.1'
+__version__ = '3.0.1'
 
 import re
 import logging
-from StringIO import StringIO
+from io import StringIO
 import sys, tempfile, os
 import subprocess
-from subprocess import call, check_output
+from subprocess import call, check_output, run
 import numpy as np
 from datetime import datetime
 import shutil
@@ -317,14 +317,14 @@ class AgrFile():
         """
         if unit == 'DEFAULT_UNIT': unit = DEFAULT_UNIT
         x_min, y_min, x_max, y_max = self.get_graph_view(g, unit)
-        print "x_min : %f %s" % (x_min, unit)
-        print "y_min : %f %s" % (y_min, unit)
-        print "x_max : %f %s" % (x_max, unit)
-        print "y_max : %f %s" % (y_max, unit)
+        print("x_min : %f %s" % (x_min, unit))
+        print("y_min : %f %s" % (y_min, unit))
+        print("x_max : %f %s" % (x_max, unit))
+        print("y_max : %f %s" % (y_max, unit))
         width = x_max - x_min
         height = y_max - y_min
-        print "width : %f %s" % (width, unit)
-        print "height: %f %s" % (height, unit)
+        print("width : %f %s" % (width, unit))
+        print("height: %f %s" % (height, unit))
 
     def set_graph_view(self, g, x_min=None, y_min=None, x_max=None, y_max=None,
     width=None, height=None, unit='DEFAULT_UNIT', move_legend=True,
@@ -386,23 +386,23 @@ class AgrFile():
             old_x_max_u = self.conv_coord(old_x_max, 'viewport', DEFAULT_UNIT)
             old_y_min_u = self.conv_coord(old_y_min, 'viewport', DEFAULT_UNIT)
             old_y_max_u = self.conv_coord(old_y_max, 'viewport', DEFAULT_UNIT)
-            print 'Moved graph to new viewpoint'
-            print "x_min : %.2f -> %.2f %s" \
-                  % (old_x_min_u, x_min_u, DEFAULT_UNIT)
-            print "y_min : %.2f -> %.2f %s" \
-                  % (old_y_min_u, y_min_u, DEFAULT_UNIT)
-            print "x_max : %.2f -> %.2f %s" \
-                  % (old_x_max_u, x_max_u, DEFAULT_UNIT)
-            print "y_max : %.2f -> %.2f %s" \
-                  % (old_y_max_u, y_max_u, DEFAULT_UNIT)
+            print('Moved graph to new viewpoint')
+            print("x_min : %.2f -> %.2f %s" \
+                  % (old_x_min_u, x_min_u, DEFAULT_UNIT))
+            print("y_min : %.2f -> %.2f %s" \
+                  % (old_y_min_u, y_min_u, DEFAULT_UNIT))
+            print("x_max : %.2f -> %.2f %s" \
+                  % (old_x_max_u, x_max_u, DEFAULT_UNIT))
+            print("y_max : %.2f -> %.2f %s" \
+                  % (old_y_max_u, y_max_u, DEFAULT_UNIT))
             width  = x_max - x_min
             height = y_max - y_min
             old_width  = old_x_max - old_x_min
             old_height = old_y_max - old_y_min
-            print "width : %.2f -> %.2f %s" \
-                  % (old_width, width, DEFAULT_UNIT)
-            print "height: %.2f -> %.2f %s" \
-                  % (old_height, height, DEFAULT_UNIT)
+            print("width : %.2f -> %.2f %s" \
+                  % (old_width, width, DEFAULT_UNIT))
+            print("height: %.2f -> %.2f %s" \
+                  % (old_height, height, DEFAULT_UNIT))
         # Move legend (if activated)
         if move_legend and old_legend_loctype.strip() == 'view':
             x_offset = x_min - old_x_min
@@ -413,10 +413,10 @@ class AgrFile():
             legend_y = old_legend_y + y_offset
             self.graphs[g]['legend'] = "%f, %f" % (legend_x, legend_y)
             if not silent:
-                print "Moved legend by offset %f, %f (%s)" \
+                print("Moved legend by offset %f, %f (%s)" \
                 % (self.conv_coord(x_offset, 'viewport', DEFAULT_UNIT),
                    self.conv_coord(y_offset, 'viewport', DEFAULT_UNIT),
-                   DEFAULT_UNIT)
+                   DEFAULT_UNIT))
 
     def conv_coord(self, val, from_unit=DEFAULT_UNIT, to_unit='viewport'):
         """ Convert between absolute and relative (viewport) coordiantes
@@ -516,45 +516,45 @@ class AgrFile():
             file
         """
         canvas_width, canvas_height = self.get_size()
-        print "Canvas size: %.2f x %.2f %s" \
-        % (canvas_width, canvas_height, DEFAULT_UNIT)
+        print("Canvas size: %.2f x %.2f %s" \
+        % (canvas_width, canvas_height, DEFAULT_UNIT))
         self.check_consistency()
         n_drawing_objects = len(self.drawing_objects)
         if n_drawing_objects == 1:
-            print "There is %d drawing object in the plot" % n_drawing_objects
+            print("There is %d drawing object in the plot" % n_drawing_objects)
         else:
-            print "There are %d drawing objects in the plot" \
-            % n_drawing_objects
+            print("There are %d drawing objects in the plot" \
+            % n_drawing_objects)
         n_regions = len(self.regions)
         if n_regions == 1:
-            print "There is %d region in the plot" % n_regions
+            print("There is %d region in the plot" % n_regions)
         else:
-            print "There are %d regions in the plot" % n_regions
+            print("There are %d regions in the plot" % n_regions)
         n_graphs = len(self.graphs)
         if n_graphs == 1:
-            print "There is %d graph in the plot" % n_graphs
+            print("There is %d graph in the plot" % n_graphs)
         else:
-            print "There are %d graphs in the plot" % n_graphs
+            print("There are %d graphs in the plot" % n_graphs)
         for i, graph in enumerate(self.graphs):
             x_min, y_min, x_max, y_max = self.get_graph_view(i)
             width = x_max - x_min
             height = y_max - y_min
             n_sets = len(graph.sets)
             if n_sets == 1:
-                print "Graph %d [size %.2f x %.2f %s at (%.2f, %f.2) %s]" \
-                % (i, width, height, DEFAULT_UNIT, x_min, y_min, DEFAULT_UNIT)
+                print("Graph %d [size %.2f x %.2f %s at (%.2f, %f.2) %s]" \
+                % (i, width, height, DEFAULT_UNIT, x_min, y_min, DEFAULT_UNIT))
             else:
-                print "Graph %d [size %.2f x %.2f %s at (%.2f, %.2f) %s]" \
-                % (i, width, height, DEFAULT_UNIT, x_min, y_min, DEFAULT_UNIT)
+                print("Graph %d [size %.2f x %.2f %s at (%.2f, %.2f) %s]" \
+                % (i, width, height, DEFAULT_UNIT, x_min, y_min, DEFAULT_UNIT))
             for j, set in enumerate(graph.sets):
-                print "    Set G%dS%d (%s): %d data points" \
-                % (i, j, set._get_type(), self.get_dataset(i,j).get_n_rows())
+                print("    Set G%dS%d (%s): %d data points" \
+                % (i, j, set._get_type(), self.get_dataset(i,j).get_n_rows()))
                 comment = set._get_comment()
                 if comment is not None and comment != "":
-                    print "        comment: %s" % comment
+                    print("        comment: %s" % comment)
                 legend = set._get_legend()
                 if legend is not None and legend != "":
-                    print "        legend : %s" % legend
+                    print("        legend : %s" % legend)
 
     def get_set(self, g, s):
         """ Return the AgrSet instance that matches the given graph and set
@@ -628,8 +628,7 @@ class AgrFile():
                 expected_g_s = expected_datasets.pop()
                 expected_type = expected_types.pop()
                 if dataset.get_g_s() != expected_g_s:
-                    raise AgrInconsistencyError("datasets are in the wrong "
-                    "order")
+                    raise AgrInconsistencyError("datasets are in the wrong order")
                 if dataset.get_type() != expected_type:
                     raise AgrInconsistencyError("datasets have the wrong type")
         except IndexError:
@@ -868,10 +867,10 @@ class AgrFile():
         command = [self.gracebat, '-v']
         output = check_output(command, stderr=subprocess.STDOUT)
         found_devices = False
-        for line in output.split("\n"):
+        for line in output.split(b'\n'):
             if found_devices:
                 return line.split()
-            if line.startswith("Registered devices:"):
+            if line.startswith(b'Registered devices:'):
                 # the next line will be the device list
                 found_devices = True
 
@@ -903,13 +902,15 @@ class AgrFile():
         if device is None:
             select_device = {
              'ps': 'PostScript', 'eps':'EPS', 'pdf':'PDF', 'jpg':'JPEG',
-             'png':'PNG'
+             'png':'PNG', 'svg':'SVG'
             }
             try:
                 device = select_device[extension]
             except KeyError:
                 logging.error("Could not determine output device")
                 return
+        device = device.encode()
+        #dpi = str(dpi).encode()
         epstopdf = None # epstopdf executable
         if device == 'PDF' and 'PDF' not in self.devices():
             # we replace the
@@ -932,9 +933,9 @@ class AgrFile():
                            '-hdevice', device, '-printfile', filename,
                            '-batch', write_batch, self.filename]
                 batchfile.write("# %s\n" % " ".join(command))
-            batchfile.write("DEVICE \"%s\" DPI %d\n" % (device, dpi))
-            batchfile.write("DEVICE \"%s\" FONT ANTIALIASING on\n" % device)
-            batchfile.write("PAGE SIZE %d, %d\n" % self.get_size(unit='pt'))
+            batchfile.write(b'DEVICE \"%s\" DPI %d\n' % (device, dpi))
+            batchfile.write(b'DEVICE \"%s\" FONT ANTIALIASING on\n' % device)
+            batchfile.write(b'PAGE SIZE %d, %d\n' % self.get_size(unit='pt'))
             for key in kwargs:
                 if isinstance(kwargs[key], bool):
                     batchfile.write("DEVICE \"%s\" OP \"%s\"\n"
@@ -944,16 +945,22 @@ class AgrFile():
                                     % (device, key, kwargs[key]))
         with tempfile.NamedTemporaryFile(suffix=".agr", delete=False) \
         as tmpfile:
-            tmpfile.write(str(self))
+            tmpfile.write(str(self).encode())
             tmpfile.flush()
             command = [self.gracebat, '-hardcopy', '-nosafe',
                        '-hdevice', device, '-printfile', filename,
                        '-batch', batchfile.name, tmpfile.name]
             if not quiet:
-                print " ".join(command)
-            call(command)
+                command_print = []
+                for i in command:
+                    if type(i)==bytes:
+                        command_print.append(i.decode())
+                    else:
+                        command_print.append(i)
+                print(" ".join(command_print))
+            output = run(command, capture_output=True, text=True)
             if not quiet:
-                print "Written hardcopy to %s" % filename
+                print("Written hardcopy to %s" % filename)
         if write_batch is not None:
             shutil.copy(batchfile.name, write_batch)
         os.unlink(batchfile.name)
@@ -963,9 +970,10 @@ class AgrFile():
             # terminal was available. Must convert filename -> pdf_filename.
             command = [epstopdf, '--outfile=%s' % pdf_filename, filename]
             if not quiet:
-                print " ".join(command)
+                print(" ".join(command))
             call(command)
             os.unlink(filename)
+        return output.stderr
 
     def edit_header(self):
         """ Load header_lines in EDITOR for editing"""
@@ -1188,7 +1196,7 @@ class AgrFile():
             if os.path.exists(out_file):
                 msg = "%s exists. Do you want to overwrite? yes/[no]: " \
                       % out_file
-                answer = raw_input(msg)
+                answer = "yes" #input(msg)
                 if answer == "yes":
                     overwrite = True
             else:
@@ -1200,9 +1208,9 @@ class AgrFile():
         if overwrite:
             with open(out_file, 'w') as fh:
                 fh.write(str(self))
-            print "Written to %s" % out_file
+            print("Written to %s" % out_file)
         else:
-            print "Nothing written"
+            print("Nothing written")
 
     def scale_font(self, factor):
         """ Scale all font sizes by the given factor """
@@ -1852,7 +1860,8 @@ class AgrDataSet():
             index number to `s`, i.e. set the first line to
             '@target G{g}.S{s}'.
         """
-        self.lines[0] = "@target G%d.S%d\n" % (g,s)
+        self.lines[0] = "@target G%d.S%i\n" % (g,s)
+        
 
     def edit_data(self):
         """ Load data lines in EDITOR for editing"""
@@ -1922,16 +1931,16 @@ class AgrDataSet():
             'Iteration %d - %10.5f' (cf. numpy savetxt documentation).
             If not given, the default format '%10g' is used.
         """
-        if len(numpy_arrays) != self.get_n_columns():
-            raise ValueError("number of passed arrays must match existing "
-            "number of columns")
+        #print( "set_data:", numpy_arrays[0][0], self.get_n_columns())
+        if len(numpy_arrays[0][0]) != self.get_n_columns():
+            raise ValueError("number of passed arrays must match existing number of columns")
         write_buffer = StringIO()
         write_buffer.write(self.lines[0])
         write_buffer.write(self.lines[1])
         if 'fmt' in kwargs:
-            np.savetxt(write_buffer, zip(*numpy_arrays), fmt=kwargs['fmt'])
+            np.savetxt(write_buffer, numpy_arrays[0], fmt=kwargs['fmt'])
         else:
-            np.savetxt(write_buffer, zip(*numpy_arrays), fmt='%10g')
+            np.savetxt(write_buffer, numpy_arrays[0], fmt='%10g')
         write_buffer.write(self.lines[-1])
         read_buffer = StringIO(write_buffer.getvalue())
         write_buffer.close()
@@ -2007,6 +2016,10 @@ def _update_properties_in_lines(lines, regexes, **kwargs):
                             val = val[:-1]
                         # then, quote it
                         val = "\"%s\"" % val
+                    if line_keyword.endswith(' on'):
+                        line_keyword = line_keyword[:-3]
+                    if line_keyword.endswith(' off'):
+                        line_keyword = line_keyword[:-4]
                     logging.debug("Setting %s for %s", val, line_keyword)
                     lines[i] = "%s%s%s%s\n" % (pre, line_keyword, sep, val)
                     del kwargs[keyword]
@@ -2252,7 +2265,7 @@ def tex2grace(string, print_string=True):
     for mapping in mappings:
         string = re.sub(mapping[0], mapping[1], string)
     if print_string:
-        print string
+        print(string)
     else:
         return string
 
@@ -2306,7 +2319,7 @@ def grace2tex(string, print_string=True):
     for mapping in mappings:
         string = re.sub(mapping[0], mapping[1], string)
     if print_string:
-        print string
+        print(string)
     else:
         return string
 
